@@ -1,0 +1,188 @@
+Task 1
+1a----------------------------------------------------------------------------------
+create schema library_management
+1b----------------------------------------------------------------------------------
+create table authors (
+author_id INT AUTO_INCREMENT PRIMARY KEY,
+author_name VARCHAR(50)
+);
+1c----------------------------------------------------------------------------------
+create table genres (
+genre_id INT AUTO_INCREMENT PRIMARY KEY,
+genre_name VARCHAR(50)
+);
+1d----------------------------------------------------------------------------------
+create table books (
+book_id INT AUTO_INCREMENT PRIMARY KEY,
+title VARCHAR(50),
+publication_year year,
+author_id int,
+foreign key (author_id) REFERENCES authors(author_id),
+genre_id int,
+foreign key (genre_id) REFERENCES genres(genre_id)
+);
+1e----------------------------------------------------------------------------------
+create table users (
+user_id INT AUTO_INCREMENT PRIMARY KEY,
+username VARCHAR(50),
+email VARCHAR(50)
+)
+1f----------------------------------------------------------------------------------
+create table borrowed_books (
+borrow_id INT AUTO_INCREMENT PRIMARY KEY,
+book_id int,
+foreign key (book_id) REFERENCES books(book_id),
+user_id  int,
+foreign key (user_id) REFERENCES users(user_id),
+borrow_date date,
+return_date date
+)
+Task 2
+----------------------------------------------------------------------------------
+INSERT INTO authors (author_name)
+VALUES ('Shevchenko'),
+('Franko');
+----------------------------------------------------------------------------------
+INSERT INTO genres (genre_name)
+VALUES ('drama'),
+('poem');
+----------------------------------------------------------------------------------
+INSERT INTO books (title, publication_year, author_id, genre_id)
+VALUES ('Nazar Stodolya', 1843, 1, 1),
+('Olga', 1875, 2, 2);
+----------------------------------------------------------------------------------
+INSERT INTO books (title, publication_year, author_id, genre_id)
+VALUES ('Nazar Stodolya', 1943, 1, 1),
+('Olga', 1975, 2, 2);
+----------------------------------------------------------------------------------
+INSERT INTO users (username, email)
+VALUES ('Anna', 'anna@gmail.com'),
+('Lanna', 'lanna@gmail.com');
+----------------------------------------------------------------------------------
+INSERT INTO borrowed_books (book_id, user_id, borrow_date, return_date)
+VALUES (5, 1, '2025-01-15', '2025-02-15'),
+(6, 2, '2025-01-17', '2025-02-17');
+----------------------------------------------------------------------------------
+
+Task 3
+SELECT orders.id as order_id, customers.name as customer, 
+employees.last_name as employee, products.name as product, order_details.quantity,
+categories.name as category, shippers.name as shipper, suppliers.name as suppliers, 
+orders.date as date
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+INNER JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+Task 4
+4.1--------------------------------------------------------------------------------
+SELECT count(orders.id) as total
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+INNER JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+4.2--------------------------------------------------------------------------------
+SELECT count(orders.id) as total
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+LEFT JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+LEFT JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+-------------------------------------------------------------------------------
+SELECT count(orders.id) as total
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+RIGHT JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+
+Загальна кількість рядків не змінилася, бо LEFT JOIN поверне таблицю orders, а за її ключем orders.id змін не відбувається, а RIGHT JOIN повертає всі categories, але count рахує orders.id, що відмінні від null
+4.3--------------------------------------------------------------------------------------
+SELECT orders.id as order_id, customers.name as customer, 
+employees.last_name as employee, products.name as product, order_details.quantity,
+categories.name as category, shippers.name as shipper, suppliers.name as suppliers, 
+orders.date as date
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+INNER JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+where employees.employee_id between 3 and 10
+4.4--------------------------------------------------------------------------------------
+SELECT categories.name as category, COUNT(*) as total_orders, 
+AVG(order_details.quantity) as avg_quantity
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+INNER JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+where employees.employee_id between 3 and 10
+group by categories.name
+4.5--------------------------------------------------------------------------------------
+SELECT categories.name AS category,  COUNT(*) AS total_orders, 
+AVG(order_details.quantity) AS avg_quantity
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+INNER JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+where employees.employee_id between 3 and 10
+group by categories.name
+having avg_quantity > 21
+4.6--------------------------------------------------------------------------------------
+SELECT categories.name AS category,  COUNT(*) AS total_orders, 
+AVG(order_details.quantity) AS avg_quantity
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+INNER JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+where employees.employee_id between 3 and 10
+group by categories.name
+having avg_quantity > 21
+order by total_orders desc
+4.7--------------------------------------------------------------------------------------
+SELECT categories.name AS category,  COUNT(*) AS total_orders, 
+AVG(order_details.quantity) AS avg_quantity
+from orders
+INNER JOIN customers on orders.customer_id = customers.id
+INNER JOIN employees on orders.employee_id = employees.employee_id
+INNER JOIN order_details on orders.id = order_details.order_id
+INNER JOIN products on order_details.product_id = products.id
+INNER JOIN categories on products.category_id = categories.id
+INNER JOIN suppliers on products.supplier_id = suppliers.id
+INNER JOIN shippers on orders.shipper_id = shippers.id
+where employees.employee_id between 3 and 10
+group by categories.name
+having avg_quantity > 21
+order by total_orders desc
+limit 4
+offset 1
+
+
+
